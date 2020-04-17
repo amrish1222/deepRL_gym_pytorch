@@ -22,12 +22,13 @@ def getKeyPress(act):
 
 if __name__ == '__main__':
     env = gym.make('LunarLander-v2')
-    agent = Agent(lr = 0.01, input_dims=8, gamma=0.99, num_actions= 4, fcl_dims_list= [128,128])
+    agent = Agent(lr = 0.001, input_dims=8, gamma=0.99, num_actions= 4, fcl_dims_list= [128, 128])
     
     score_history = []
     score = 0
     num_episodes = 2500
     avg = []
+    epList = []
     keypress = 1    
 #    env = wrappers.Monitor(env, 'tmp/lunarLander', video_callable = lambda)
     
@@ -49,14 +50,22 @@ if __name__ == '__main__':
             score += reward
         
         score_history.append(score)
-        agent.learn()
+        if episode%1 == 0:
+            agent.learn()
       
         if len(score_history) > 100:
             avg.append(mean(score_history[-100:]))
+            epList.append(episode)
         elif len(score_history) <= 1:
             pass
         else:
             avg.append(mean(score_history))
-        if episode % 100 == 1 and len(avg) > 0:
-            plt.plot(avg)
-            plt.pause(0.0001)
+            epList.append(episode)
+            
+        if episode%100 == 0:
+            fig = plt.figure(1)
+            plt.plot(epList,avg, 'b+')
+            plt.pause(0.001)
+            epList = []
+            avg = []
+   
